@@ -30,7 +30,7 @@ Add new graph to dashboard
 
 from influxdb import InfluxDBClient
 from ruuvitag_sensor.ruuvi import RuuviTagSensor
-
+import time
 
 def convert_to_influx(mac, payload):
     return {
@@ -41,14 +41,39 @@ def convert_to_influx(mac, payload):
         "fields": {
             "temperature": payload["temperature"],
             "humidity": payload["humidity"],
-            "pressure": payload["pressure"]
+            "pressure": payload["pressure"],
+	    "battery" : payload["battery"],
+	    "acc_X"   : payload["acceleration_x"],
+	    "acc_Y"   : payload["acceleration_y"],
+	    "acc_Z"   : payload["acceleration_z"],
+	    "counter" : payload["movement_counter"],
+	    "tx_power": payload["tx_power"]
         }
     }
 
 
 client = InfluxDBClient(host="localhost", port=8086, database="tag_data")
 
+count = 0
+print("sending data")
+
 while True:
-    datas = RuuviTagSensor.get_data_for_sensors()
-    json_body = [convert_to_influx(mac, payload) for mac, payload in datas.items()]
-    client.write_points(json_body)
+	datas = RuuviTagSensor.get_data_for_sensors()
+	json_body = [convert_to_influx(mac, payload) for mac, payload in datas.items()]
+	try:
+		
+		client.write_points(json_body)
+		print("sending successful")
+		print(count)
+		count = count + 1
+	except:
+		print("sending failed")
+    
+'''
+	# Wait for 2 seconds and start again
+	try:
+		time.sleep(2)
+	except KeyboardInterrupt:
+		print('Exit')
+		break
+'''
