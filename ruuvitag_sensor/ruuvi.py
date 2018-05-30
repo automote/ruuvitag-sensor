@@ -88,7 +88,7 @@ class RuuviTagSensor(object):
         return datas
 
     @staticmethod
-    def get_data_for_sensors(macs=[], search_duratio_sec=5, bt_device=''):
+    def get_data_for_sensors(macs=[], search_duratio_sec=2, bt_device=''):
         """
         Get lates data for sensors in the MAC's list.
 

@@ -56,20 +56,27 @@ client = InfluxDBClient(host="localhost", port=8086, database="tag_data")
 
 count = 0
 print("sending data")
+'''
+sensor = RuuviTag(mac)
 
 while True:
-	datas = RuuviTagSensor.get_data_for_sensors()
-	json_body = [convert_to_influx(mac, payload) for mac, payload in datas.items()]
+    data = sensor.update()
+'''
+while True:
 	try:
-		
+		print("reading Data")
+		#datas = RuuviTag.update()
+		datas = RuuviTagSensor.get_data_for_sensors(macs='EE:A1:C8:AF:34:5D')
+		print(datas)		
+		print("reading Done")
+		json_body = [convert_to_influx(mac, payload) for mac, payload in datas.items()]
 		client.write_points(json_body)
 		print("sending successful")
 		print(count)
 		count = count + 1
 	except:
-		print("sending failed")
-    
-'''
+        	print("sending failed")
+'''    
 	# Wait for 2 seconds and start again
 	try:
 		time.sleep(2)
@@ -77,3 +84,4 @@ while True:
 		print('Exit')
 		break
 '''
+
